@@ -729,7 +729,7 @@ store.update = function(successCb, errorCb, skipLoad) {
             store.once.unregister(onVerified);
             store.once.unregister(onUnverified);
             if (errorCb) {
-                errorCb(store.ERR_VERIFICATION_FAILED, 'Expired');
+                errorCb(store.ERR_PAYMENT_EXPIRED, 'Expired');
             }
         }
     }, errorCb);
