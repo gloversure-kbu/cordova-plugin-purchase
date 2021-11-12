@@ -1905,7 +1905,7 @@ store._validator = function(product, callback, isPrepared) {
 /// user password. Note that this method is called automatically for you on a few
 /// useful occasions, like when a subscription expires.
 ///
-store.update = function() {};
+// store.update = function() {};
 
 })();
 (function() {
@@ -4227,6 +4227,7 @@ store.update = function(successCb, errorCb, skipLoad) {
             if (p) {
                 store.once(p.id, 'verified', onVerified);
                 store.once(p.id, 'unverified', onUnverified);
+                store.once(p.id, 'expired', onExpired);
                 p.set("state", store.APPROVED);
                 p.verify();
                 return;
@@ -4238,6 +4239,7 @@ store.update = function(successCb, errorCb, skipLoad) {
 
         function onVerified() {
             store.once.unregister(onUnverified);
+            store.once.unregister(onExpired);
             syncWithAppStoreReceipt(p.transaction);
             if (successCb) {
                 successCb();
@@ -4245,8 +4247,16 @@ store.update = function(successCb, errorCb, skipLoad) {
         }
         function onUnverified() {
             store.once.unregister(onVerified);
+            store.once.unregister(onExpired);
             if (errorCb) {
                 errorCb(store.ERR_VERIFICATION_FAILED, 'Invalid appStoreReceipt');
+            }
+        }
+        function onExpired() {
+            store.once.unregister(onVerified);
+            store.once.unregister(onUnverified);
+            if (errorCb) {
+                errorCb(store.ERR_VERIFICATION_FAILED, 'Expired');
             }
         }
     }, errorCb);
